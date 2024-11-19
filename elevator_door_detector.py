@@ -9,7 +9,7 @@ import urllib.request
 
 
 class ElevatorDoorDetector(object):
-    def __init__(self, min_score, show_bounding_box, max_reverse_count=0, reverse_throttle=-0.5, debug=False):
+    def __init__(self, min_score, max_reverse_count=0, reverse_throttle=-0.5, debug=False):
         self.last_5_scores = collections.deque(np.zeros(5), maxlen=5)
 
         #self.STOP_SIGN_CLASS_ID = 12
