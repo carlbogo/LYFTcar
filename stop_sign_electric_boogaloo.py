@@ -10,7 +10,7 @@ from tensorflow.keras.models import load_model
 
 
 class StopSignDetector(object):
-    def __init__(self, min_score, max_reverse_count=0, reverse_throttle=-0.5, debug=False):
+    def __init__(self, min_score, reverse_throttle=-0.5, debug=False):
         self.last_5_scores = collections.deque(np.zeros(5), maxlen=5)
 
         #self.STOP_SIGN_CLASS_ID = 12
@@ -20,8 +20,8 @@ class StopSignDetector(object):
         self.model = load_model('models/lightweight_cnn_model-2-2.h5')
 
         # reverse throttle related
-        self.max_reverse_count = max_reverse_count
-        self.reverse_count = max_reverse_count
+        #self.max_reverse_count = max_reverse_count
+        #self.reverse_count = max_reverse_count
         self.reverse_throttle = reverse_throttle
         self.is_reversing = False
 
@@ -41,15 +41,14 @@ class StopSignDetector(object):
         if img_arr is None:
             return throttle, img_arr
         if self.detect_elevator_door(img_arr):
-            #self.is_reversing = True
+            self.is_reversing = True
             #self.reverse_count += 1
             print('lift')
+            print(self.reverse_throttle)
             return self.reverse_throttle, img_arr
         else:
             print('faaakkk')
+            print(throttle)
             self.is_reversing = False
-            self.reverse_count = 0
+            #self.reverse_count = 0
             return throttle, img_arr
-
-
-
