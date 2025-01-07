@@ -1,7 +1,7 @@
 #Implmentation to the manage.py file
 
 #from donkeycar.parts.tight_turn import TightTurn
-#tight_turn = TightTurn(pivot_duration=1.5, reverse_duration=1.0)
+#tight_turn = TurnAround(pivot_duration=1.5, reverse_duration=1.0)
 #V.add(tight_turn, inputs=['user/throttle', 'user/steering'], outputs=['throttle', 'steering'])
 
 
@@ -27,6 +27,10 @@ class TurnAround:
         self.state = "reverse"  # Initial state
         self.start_time = None
         self.current_pivot = 0
+        self.enabled = False
+
+    def launch():
+        print('Juhhuuuu!. Pööramini töötab!')
 
     def run(self, throttle, steering):
         """
