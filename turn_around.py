@@ -1,3 +1,10 @@
+#Implmentation to the manage.py file
+
+#from donkeycar.parts.tight_turn import TightTurn
+#tight_turn = TightTurn(pivot_duration=1.5, reverse_duration=1.0)
+#V.add(tight_turn, inputs=['user/throttle', 'user/steering'], outputs=['throttle', 'steering'])
+
+
 import time
 
 class TurnAround:
