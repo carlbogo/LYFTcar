@@ -10,56 +10,47 @@ from tensorflow.keras.models import load_model
 
 
 class StopSignDetector(object):
-    def __init__(self, min_score, max_reverse_count=0, reverse_throttle=-0.5, debug=False):
+    def __init__(self, min_score, reverse_throttle=-0.5, debug=False):
         self.last_5_scores = collections.deque(np.zeros(5), maxlen=5)
 
         #self.STOP_SIGN_CLASS_ID = 12
         self.min_score = min_score
         self.debug = debug
         self.model_name = 'liftModel'
-        self.model = load_model('lightweight_cnn_model.h5')
+        self.model = load_model('models/lightweight_cnn_model-2-2.h5')
 
         # reverse throttle related
-        self.max_reverse_count = max_reverse_count
-        self.reverse_count = max_reverse_count
+        self.max_reverse_count = 10
+        self.reverse_count = 0
         self.reverse_throttle = reverse_throttle
         self.is_reversing = False
 
     def convertImageArrayToPILImage(self, img_arr):
-        img = Image.fromarray(img_arr.astype('uint8'), 'RGB')
-
+        img = np.array(img_arr)
         return img
-    
 
     def detect_elevator_door (self, img_arr):
-        img = self.convertImageArrayToPILImage(img_arr)
         # Model inference
-        prediction = self.model.predict(img)
-        predicted_class = np.argmax(prediction, axis=1)
-        return predicted_class == 1
-    
-    def hardcodedfuckery():
-        pass
+        img = np.array(img_arr)
+        bimage = np.expand_dims(img, axis=0)
+        prediction = self.model.predict(bimage)[0][0]
+        return prediction >= 0.5
 
 
     def run(self, img_arr, throttle, debug=False):
         if img_arr is None:
             return throttle, img_arr
-        return
-        '''
-        if self.model_name == 'liftModel':
-            if self.detect_elevator_door(img_arr):
-                #self.is_reversing = True
-                #self.reverse_count += 1
-                print('n-sõna')
-                self.model = 'sõidaLift'
-                return self.reverse_throttle, img_arr
-        if self.model == 'sõidaLift':
-            hardcodedfuckery()
-            pass
+        if self.detect_elevator_door(img_arr):
+            self.is_reversing = True
+            self.reverse_count += 1
+            print('lift')
+            if self.reverse_count > self.max_reverse_count:
+                return 0, img_arr
+            else:
+               return self.reverse_throttle, img_arr
         else:
             print('faaakkk')
+            print(throttle)
             self.is_reversing = False
-            self.reverse_count = 0
-            return throttle, img_arr
-            '''
+            #self.reverse_count = 0
+            return 0.8, img_arr

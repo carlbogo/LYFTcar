@@ -41,6 +41,7 @@ from donkeycar.parts.kinematics import Bicycle, InverseBicycle, BicycleUnnormali
 from donkeycar.parts.explode import ExplodeDict
 from donkeycar.parts.transform import Lambda
 from donkeycar.parts.pipe import Pipe
+from donkeycar.parts.turn_around import TurnAround
 from donkeycar.utils import *
 
 logger = logging.getLogger(__name__)
@@ -436,6 +437,11 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
     #
     # NOTE: when launch throttle is in effect, pilot speed is set to None
     #
+    turnAroundPart = TurnAround()
+    V.add(turnAroundPart,
+          inputs=['user/throttle', 'pilot/angle'],
+          outputs=['user/throttle', 'pilot/angle'])
+
     aiLauncher = AiLaunch(cfg.AI_LAUNCH_DURATION, cfg.AI_LAUNCH_THROTTLE, cfg.AI_LAUNCH_KEEP_ENABLED)
     V.add(aiLauncher,
           inputs=['user/mode', 'pilot/throttle'],
@@ -454,6 +460,7 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
     if (cfg.CONTROLLER_TYPE != "pigpio_rc") and (cfg.CONTROLLER_TYPE != "MM1"):
         if isinstance(ctr, JoystickController):
             ctr.set_button_down_trigger(cfg.AI_LAUNCH_ENABLE_BUTTON, aiLauncher.enable_ai_launch)
+            ctr.set_button_down_trigger('X', turnAroundPart.launch)
 
 
     # Ai Recording
@@ -649,6 +656,7 @@ class DriveMode:
                  scaled by ai_throttle_mult in autopilot mode
         """
         if mode == 'user':
+           # print(user_steering, user_throttle)
             return user_steering, user_throttle
         elif mode == 'local_angle':
             return pilot_steering if pilot_steering else 0.0, user_throttle
